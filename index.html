@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Linea Airdrop Checker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white antialiased">
+
+    <div class="container mx-auto px-4 py-8 md:py-12 min-h-screen flex flex-col items-center justify-center">
+        
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-teal-300">
+                Linea Airdrop Checker
+            </h1>
+            <p class="text-gray-400 mt-2 max-w-2xl mx-auto">
+                Enter your LXP amount to see a simulated estimate of your Linea token airdrop allocation based on available data.
+            </p>
+        </div>
+
+        <!-- Input Card -->
+        <div class="w-full max-w-lg p-6 md:p-8 rounded-2xl glass-card shadow-lg mb-8">
+            <div class="space-y-4">
+                <div>
+                    <label for="lxpInput" class="block text-sm font-medium text-gray-300 mb-2">Enter Your Wallet LXP</label>
+                    <input type="number" id="lxpInput" placeholder="" class="w-full bg-gray-800 border border-gray-700 text-white rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200">
+                </div>
+                <button id="calculateBtn" class="w-full bg-gradient-to-r from-blue-500 to-teal-400 hover:from-blue-600 hover:to-teal-500 text-white font-bold py-3 px-4 rounded-lg shadow-md transition-transform transform hover:scale-105">
+                    Calculate Estimate
+                </button>
+            </div>
+        </div>
+
+        <!-- Result Section -->
+        <div id="resultSection" class="w-full max-w-lg hidden">
+            <div class="p-6 md:p-8 rounded-2xl glass-card shadow-lg animate-fade-in">
+                <h2 class="text-2xl font-bold text-center mb-6 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-teal-300">Your Estimated Result</h2>
+                
+                <!-- Estimated Token -->
+                <div class="text-center bg-gray-800/50 p-6 rounded-xl mb-6 border border-teal-400/30">
+                    <p class="text-gray-400 text-sm">Your Estimated Linea Tokens</p>
+                    <p id="estimatedTokens" class="text-4xl font-bold text-teal-300 my-2">0</p>
+                </div>
+
+                <!-- Simulation Details Table -->
+                <div class="space-y-3 text-sm">
+                    <h3 class="text-lg font-semibold text-gray-200 mb-3 border-b border-gray-700 pb-2">Simulation Details</h3>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-400">Total Token Supply</span>
+                        <span id="totalTokenSupply" class="font-semibold text-gray-100">0</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-400">Airdrop Allocation (9%)</span>
+                        <span id="airdropAllocation" class="font-semibold text-gray-100">0</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-400">Total LXP passed POH</span>
+                        <span id="totalLxp" class="font-semibold text-gray-100">0</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-400">Your Wallet LXP</span>
+                        <span id="userLxp" class="font-semibold text-blue-400">0</span>
+                    </div>
+                    <div class="flex justify-between items-center pt-2 mt-2 border-t border-gray-700">
+                        <span class="text-gray-400">Token per LXP Ratio</span>
+                        <span id="ratioPerLxp" class="font-semibold text-gray-100">0</span>
+                    </div>
+                </div>
+
+                <!-- Analysis -->
+                <div class="mt-6 pt-4 border-t border-gray-700">
+                    <h3 class="text-lg font-semibold text-gray-200 mb-2">Analysis</h3>
+                    <p id="analysisText" class="text-gray-400 text-sm">
+                        With a total supply of 72,009,990,000 tokens and a 9% airdrop allocation, your wallet with <strong class="text-blue-400" id="analysisLxp">0 LXP</strong> is estimated to receive approximately <strong class="text-teal-300" id="analysisTokens">0 Linea tokens</strong>.
+                    </p>
+                </div>
+
+                <!-- Price Prediction Section -->
+                <div id="priceSimulationSection" class="mt-6 pt-4 border-t border-gray-700">
+                    <h3 class="text-lg font-semibold text-gray-200 mb-3">Listing Price Prediction (Simulation)</h3>
+                    <p class="text-gray-400 text-xs mb-4">
+                        This is a speculative simulation of your airdrop's potential value based on different market cap scenarios.
+                    </p>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm">
+                            <thead class="bg-gray-800/50">
+                                <tr>
+                                    <th class="p-2 rounded-tl-lg">Scenario</th>
+                                    <th class="p-2">Price/Token</th>
+                                    <th class="p-2 rounded-tr-lg">Your Airdrop Value</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="border-b border-gray-700">
+                                    <td class="p-2 font-medium">Conservative<br><span class="text-xs text-gray-500">$5B MC</span></td>
+                                    <td id="conservativePrice" class="p-2">$0.00</td>
+                                    <td id="conservativeValue" class="p-2 font-bold text-teal-300">$0.00</td>
+                                </tr>
+                                <tr class="border-b border-gray-700">
+                                    <td class="p-2 font-medium">Moderate<br><span class="text-xs text-gray-500">$10B MC</span></td>
+                                    <td id="moderatePrice" class="p-2">$0.00</td>
+                                    <td id="moderateValue" class="p-2 font-bold text-teal-300">$0.00</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-2 font-medium">Aggressive<br><span class="text-xs text-gray-500">$20B MC</span></td>
+                                    <td id="aggressivePrice" class="p-2">$0.00</td>
+                                    <td id="aggressiveValue" class="p-2 font-bold text-teal-300">$0.00</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        
+        <!-- Disclaimer -->
+        <div class="text-center mt-8 max-w-2xl mx-auto">
+            <p class="text-xs text-gray-500">
+                <strong>Disclaimer:</strong> This is a simulation based on currently available public data. The final amount you receive may differ and could be influenced by other factors announced by the Linea team, such as specific eligibility criteria, multiplier, or a different tiering system.
+            </p>
+        </div>
+        
+        <!-- Creator Credit -->
+        <div class="text-center mt-6">
+            <a href="https://x.com/0xdor" target="_blank" rel="noopener noreferrer" class="text-sm text-gray-500 hover:text-teal-400 transition-colors duration-200">
+                Created by @0xdor
+            </a>
+        </div>
+
+    </div>
+
+    <script>
+        // --- Constants based on provided data ---
+        const TOTAL_TOKEN_SUPPLY = 72009990000;
+        const AIRDROP_ALLOCATION_PERCENTAGE = 0.09;
+        const TOTAL_LXP_SUPPLY = 1832039638; // UPDATED VALUE
+
+        // --- Derived Calculation ---
+        const totalAirdropTokens = TOTAL_TOKEN_SUPPLY * AIRDROP_ALLOCATION_PERCENTAGE;
+        const ratioPerLxp = totalAirdropTokens / TOTAL_LXP_SUPPLY;
+
+        // --- DOM Elements ---
+        const lxpInput = document.getElementById('lxpInput');
+        const calculateBtn = document.getElementById('calculateBtn');
+        const resultSection = document.getElementById('resultSection');
+
+        // Result display elements
+        const estimatedTokensEl = document.getElementById('estimatedTokens');
+        const totalTokenSupplyEl = document.getElementById('totalTokenSupply');
+        const airdropAllocationEl = document.getElementById('airdropAllocation');
+        const totalLxpEl = document.getElementById('totalLxp');
+        const userLxpEl = document.getElementById('userLxp');
+        const ratioPerLxpEl = document.getElementById('ratioPerLxp');
+        
+        // Analysis elements
+        const analysisLxpEl = document.getElementById('analysisLxp');
+        const analysisTokensEl = document.getElementById('analysisTokens');
+
+        // Price prediction elements
+        const conservativePriceEl = document.getElementById('conservativePrice');
+        const conservativeValueEl = document.getElementById('conservativeValue');
+        const moderatePriceEl = document.getElementById('moderatePrice');
+        const moderateValueEl = document.getElementById('moderateValue');
+        const aggressivePriceEl = document.getElementById('aggressivePrice');
+        const aggressiveValueEl = document.getElementById('aggressiveValue');
+
+        // --- Event Listener ---
+        calculateBtn.addEventListener('click', () => {
+            const userLxp = parseFloat(lxpInput.value);
+
+            if (isNaN(userLxp) || userLxp <= 0) {
+                alert("Please enter a valid LXP amount.");
+                return;
+            }
+
+            // Calculate the user's estimated airdrop
+            const estimatedTokens = userLxp * ratioPerLxp;
+
+            // Helper function for number formatting
+            const formatNumber = (num, decimals = 0) => num.toLocaleString('en-US', {
+                minimumFractionDigits: decimals,
+                maximumFractionDigits: decimals
+            });
+            const formatCurrency = (num) => `$${formatNumber(num, 2)}`;
+
+            // Update the UI with the results
+            estimatedTokensEl.textContent = formatNumber(estimatedTokens, 0);
+            totalTokenSupplyEl.textContent = formatNumber(TOTAL_TOKEN_SUPPLY);
+            airdropAllocationEl.textContent = `${formatNumber(totalAirdropTokens)} tokens`;
+            totalLxpEl.textContent = `${formatNumber(TOTAL_LXP_SUPPLY)} LXP`;
+            userLxpEl.textContent = `${formatNumber(userLxp)} LXP`;
+            ratioPerLxpEl.textContent = `~${ratioPerLxp.toFixed(4)} tokens/LXP`;
+
+            // Update analysis text
+            analysisLxpEl.textContent = `${formatNumber(userLxp)} LXP`;
+            analysisTokensEl.textContent = `~${formatNumber(estimatedTokens, 0)} Linea tokens`;
+
+            // --- Calculate and Display Price Predictions ---
+            const marketCaps = {
+                conservative: 5_000_000_000,
+                moderate: 10_000_000_000,
+                aggressive: 20_000_000_000
+            };
+
+            // Conservative Scenario
+            const priceConservative = marketCaps.conservative / TOTAL_TOKEN_SUPPLY;
+            const valueConservative = estimatedTokens * priceConservative;
+            conservativePriceEl.textContent = `$${priceConservative.toFixed(4)}`;
+            conservativeValueEl.textContent = formatCurrency(valueConservative);
+
+            // Moderate Scenario
+            const priceModerate = marketCaps.moderate / TOTAL_TOKEN_SUPPLY;
+            const valueModerate = estimatedTokens * priceModerate;
+            moderatePriceEl.textContent = `$${priceModerate.toFixed(4)}`;
+            moderateValueEl.textContent = formatCurrency(valueModerate);
+
+            // Aggressive Scenario
+            const priceAggressive = marketCaps.aggressive / TOTAL_TOKEN_SUPPLY;
+            const valueAggressive = estimatedTokens * priceAggressive;
+            aggressivePriceEl.textContent = `$${priceAggressive.toFixed(4)}`;
+            aggressiveValueEl.textContent = formatCurrency(valueAggressive);
+
+            // Show the result section
+            resultSection.classList.remove('hidden');
+        });
+
+        // Add keypress event to input for Enter key
+        lxpInput.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault(); // Prevent form submission
+                calculateBtn.click(); // Trigger button click
+            }
+        });
+
+    </script>
+</body>
+</html>
